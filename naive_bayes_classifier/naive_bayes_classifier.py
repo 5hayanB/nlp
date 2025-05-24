@@ -1,6 +1,7 @@
 from collections import defaultdict
 from re import findall
 from math import log
+from csv import reader
 
 class NaiveBayesClassifier:
     def __init__(self):
@@ -64,19 +65,26 @@ class NaiveBayesClassifier:
         return correct / len(test_documents)
 
 if __name__ == "__main__":
+    with open('spam.csv', errors = 'replace') as f:
+        spamreader = list(reader(f))[1:]
+    train_split = int(len(spamreader) * 0.7)
+    test_split = len(spamreader) - train_split
     train_docs = [
-        "A great movie with fantastic acting",
-        "Horrible plot and bad editing",
-        "Wonderful cinematography and score",
-        "Terrible dialogue and pacing",
-        "Brilliant performance by lead actor"
+        spamreader[i][1]
+        for i in range(train_split)
     ]
-    train_classes = ["positive", "negative", "positive", "negative", "positive"]
+    train_classes = [
+        spamreader[i][0]
+        for i in range(train_split)
+    ]
     test_docs = [
-        "Amazing special effects and plot",
-        "Worst movie I've ever seen"
+        spamreader[train_split + i][1]
+        for i in range(test_split)
     ]
-    test_classes = ["positive", "negative"]
+    test_classes = [
+        spamreader[i][0]
+        for i in range(test_split)
+    ]
     # Create and train classifier
     nb = NaiveBayesClassifier()
     nb.fit(train_docs, train_classes)
